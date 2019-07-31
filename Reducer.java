@@ -5,12 +5,16 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.Arrays;
 import java.util.*;
 import java.io.*;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class Reducer extends Thread
 {
+    private static Socket socket;
     private CyclicBarrier barrier;
-    public Thread t;
     
+
   public void run() 
     {      
             
@@ -19,19 +23,30 @@ public class Reducer extends Thread
           
             */
            //reading stream fromthe  mapper
-           Reader reader = new InputStreamReader(System.in);
-           BufferedReader br = new BufferedReader(reader);
-           String x = br.readLine();
-           
+           int port = 5000;
+           ServerSocket serverSocket = new ServerSocket(port);
+           InputStream istream = socket.getInputStream();
+           BufferedReader receiveRead = new BufferedReader(new InputStreamReader(istream));
+           //Reader reader = new InputStreamReader(System.in);
+           //BufferedReader br = new BufferedReader(reader);
+           String receivedString = receiveRead.readLine();
+           System.out.println(receivedString);
            barrier.await(); 
         }catch (Exception e) 
         { 
             System.out.println ("Exception is caught"); 
-        } 
+        }
+        finally
+        {
+            try
+            {
+                socket.close();
+            }catch(Exception e){}
+        }
          
     } 
   
-    public static void main(String args[]) throws InterruptedException, BrokenBarrierException{
+    public static void main(String args[]) throws InterruptedException, BrokenBarrierException, IOException{
      /*
      Test vals 
      __________  
@@ -49,23 +64,55 @@ public class Reducer extends Thread
         }
         */
        //creating the barrier
+       
        CyclicBarrier newBarrier = new CyclicBarrier(4);
+       Reader reader = new InputStreamReader(System.in);      
+       BufferedReader breader = new BufferedReader(reader);
+       Hashtable<String, Integer> h = new Hashtable<String, Integer>(); 
+       int wordcount = 0;
+       String stemWords = "";
+       
+       
+       
+       
        Thread t1 = new Thread(new Reducer());
        Thread t2 = new Thread(new Reducer());
        Thread t3 = new Thread(new Reducer());
        Thread t4 = new Thread(new Reducer());
        
        t1.start();
-       t2.start();
-       t3.start();
-       t4.start();
-       //populating the hashtable
-       String stemWords = "";
+       stemWords = breader.readLine();
        String[] words = stemWords.split("[, ]");
-       Hashtable<String, Integer> h = new Hashtable<String, Integer>(); 
-       for (int i = 0; i < words.length; i += 2) {
+           for (int i = 0; i < words.length; i += 2) {
                h.put(words[i], Integer.parseInt(words[i + 1]));
               }
+       t2.start();
+       stemWords = breader.readLine();
+       words = stemWords.split("[, ]");
+           for (int i = 0; i < words.length; i += 2) {
+               h.put(words[i], Integer.parseInt(words[i + 1]));
+              }
+       t3.start();
+       stemWords = breader.readLine();
+       words = stemWords.split("[, ]");
+           for (int i = 0; i < words.length; i += 2) {
+               h.put(words[i], Integer.parseInt(words[i + 1]));
+              }
+       t4.start();
+       stemWords = breader.readLine();
+       words = stemWords.split("[, ]");
+           for (int i = 0; i < words.length; i += 2) {
+               h.put(words[i], Integer.parseInt(words[i + 1]));
+              }
+       
+       for(int value : h.values()){
+           wordcount += value;
+        }
+        
+       System.out.println(wordcount);
+       //populating the hashtable
+       
+       
    }     
   
 
