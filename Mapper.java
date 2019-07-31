@@ -23,4 +23,11 @@ public static void Mapper(String stemWords){
  
     }
 }
+public static void main(String[] args) throws IOException{
+
+    Reader reader = new InputStreamReader(System.in);
+    BufferedReader br = new BufferedReader(reader);
+    String x = br.readLine();
+    Mapper(x); 
+}
 }
